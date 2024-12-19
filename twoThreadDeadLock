@@ -1,0 +1,41 @@
+public class DeadlockExample {
+    private static Object lockA = new Object();
+    private static Object lockB = new Object();
+ 
+    public static void main(String[] args) {
+        Thread t1 = new Thread(new Runnable() {
+            public void run() {
+                synchronized (lockA) {
+                    System.out.println(Thread.currentThread().getName() + " acquired lockA");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    synchronized (lockB) {
+                        System.out.println(Thread.currentThread().getName() + " acquired lockB");
+                    }
+                }
+            }
+        });
+ 
+        Thread t2 = new Thread(new Runnable() {
+            public void run() {
+                synchronized (lockB) {
+                    System.out.println(Thread.currentThread().getName() + " acquired lockB");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    synchronized (lockA) {
+                        System.out.println(Thread.currentThread().getName() + " acquired lockA");
+                    }
+                }
+            }
+        });
+ 
+        t1.start();
+        t2.start();
+    }
+}
